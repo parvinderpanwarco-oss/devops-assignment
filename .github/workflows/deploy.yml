@@ -7,6 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+    
     - name: Deploy via SSH
       uses: appleboy/ssh-action@master
       with:
@@ -15,5 +16,9 @@ jobs:
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
           cd /var/www/app || exit
-          npm install --production
-          pm2 restart app || pm2 start app.js --name "app"
+          # Clean directory and clone/sync files directly
+          sudo rm -rf *
+          sudo curl -O https://githubusercontent.com{{ github.repository }}/main/app.js
+          sudo curl -O https://githubusercontent.com{{ github.repository }}/main/package.json
+          sudo npm install --production
+          sudo pm2 restart app || sudo pm2 start app.js --name "app"
